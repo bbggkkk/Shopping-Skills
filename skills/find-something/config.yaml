@@ -1,0 +1,157 @@
+# Find Something - 파이프라인 파라미터
+
+# 파이프라인 설정
+pipeline:
+  max_retries: 3
+  timeout_seconds: 30
+  save_intermediate_results: true
+
+# 검색 설정
+search:
+  sources:
+    web_search: true
+    news_search: true
+    document_search: true
+    code_search: false
+    image_search: false
+
+  max_results_per_source: 15
+  max_total_results: 50
+
+  검색엔진:
+    - name: google
+      enabled: true
+      priority: 1
+    - name: naver
+      enabled: true
+      priority: 2
+      language: ko
+    - name: bing
+      enabled: true
+      priority: 3
+
+  대상_유형별_소스:
+    product:
+      priority_sources: ["web_search", "shopping_mall"]
+    document:
+      priority_sources: ["web_search", "document_search"]
+    code:
+      priority_sources: ["code_search", "web_search"]
+    person:
+      priority_sources: ["web_search", "news_search"]
+    place:
+      priority_sources: ["web_search", "image_search"]
+    news:
+      priority_sources: ["news_search", "web_search"]
+    general:
+      priority_sources: ["web_search"]
+
+# 결과 수집 설정
+collection:
+  deduplication:
+    title_similarity_threshold: 0.8
+    url_match_exact: true
+    content_similarity_threshold: 0.7
+
+  trust_score_weights:
+    source_count: 0.3
+    source_authority: 0.25
+    recency: 0.2
+    consistency: 0.15
+    information_completeness: 0.1
+
+  filtering:
+    min_trust_score: 0.4
+    require_source: true
+
+# 검증 설정
+validation:
+  accuracy_check:
+    enabled: true
+    require_multiple_sources: true
+
+  recency_check:
+    enabled: true
+    max_age_days:
+      news: 7
+      general: 365
+      reference: 730
+
+  source_authority:
+    enabled: true
+    trusted_domains:
+      - wikipedia.org
+      - naver.com
+      - gov.*
+      - edu.*
+      - or.kr
+    blocked_domains: []
+
+  cross_reference:
+    enabled: true
+    min_sources: 2
+
+# 리포트 설정
+report:
+  format: markdown
+
+  include_summary: true
+  include_detailed_results: true
+  include_alternatives: true
+  include_sources: true
+
+  alternatives:
+    max_count: 3
+    min_trust_score: 0.5
+
+# 대상 유형별 설정
+target_types:
+  product:
+    validation:
+      stock_check: false
+      spec_match: true
+      price_consistency: true
+      source_authority: true
+
+  document:
+    validation:
+      accuracy_check: true
+      recency_check: true
+      source_authority: true
+      cross_reference: true
+
+  code:
+    validation:
+      accuracy_check: true
+      recency_check: true
+      source_authority: false
+      cross_reference: false
+
+  person:
+    validation:
+      accuracy_check: true
+      recency_check: true
+      source_authority: true
+      cross_reference: true
+
+  place:
+    validation:
+      accuracy_check: true
+      recency_check: false
+      source_authority: true
+      cross_reference: true
+
+  news:
+    validation:
+      accuracy_check: true
+      recency_check: true
+      max_age_days: 7
+      source_authority: true
+      cross_reference: true
+
+  general:
+    validation:
+      accuracy_check: true
+      recency_check: false
+      source_authority: false
+      cross_reference: false
