@@ -1,0 +1,156 @@
+# Find Goods - 파이프라인 파라미터
+
+# 파이프라인 설정
+pipeline:
+  max_retries: 3
+  timeout_seconds: 30
+  save_intermediate_results: true
+
+# 검색 설정
+search:
+  # 검색 소스 활성화
+  sources:
+    web_search: true
+    shopping_mall: true
+    price_comparison: true
+  
+  # 검색 결과 제한
+  max_results_per_source: 10
+  max_total_results: 30
+  
+  # 검색 쇼핑몰
+  shopping_malls:
+    - name: coupang
+      domain: coupang.com
+      enabled: true
+    - name: naver_shopping
+      domain: shopping.naver.com
+      enabled: true
+    - name: elevenst
+      domain: 11st.co.kr
+      enabled: true
+    - name: gmarket
+      domain: gmarket.co.kr
+      enabled: true
+    - name: amazon
+      domain: amazon.com
+      enabled: false  # 해외 직구 비활성화
+  
+  # 가격 비교 사이트
+  price_comparison_sites:
+    - name: danawa
+      domain: danawa.com
+      enabled: true
+      category: electronics
+    - name: naver_price
+      domain: search.naver.com
+      enabled: true
+      category: all
+    - name: enuri
+      domain: enuri.com
+      enabled: true
+      category: all
+
+# 결과 수집 설정
+collection:
+  # 중복 제거 기준
+  deduplication:
+    name_similarity_threshold: 0.8
+    model_match_exact: true
+    url_match_exact: true
+  
+  # 신뢰도 평가 가중치
+  trust_score_weights:
+    source_count: 0.3
+    seller_trust: 0.25
+    review_score: 0.2
+    price_consistency: 0.15
+    information_completeness: 0.1
+  
+  # 필터링 기준
+  filtering:
+    min_trust_score: 0.5
+    min_review_count: 0
+    min_rating: 0
+
+# 검증 설정
+validation:
+  # 재고 검증
+  stock_check:
+    enabled: true
+    require_real_time: false
+  
+  # 사양 검증
+  spec_match:
+    enabled: true
+    critical_spec_match_required: true
+    critical_specs:
+      - cpu
+      - ram
+      - storage
+      - screen_size
+  
+  # 가격 검증
+  price_consistency:
+    enabled: true
+    tolerance_percent: 30
+    warning_threshold_percent: 20
+  
+  # 제품 특성 검증
+  product_match:
+    enabled: true
+    check_category: true
+    check_brand: true
+    check_model: true
+
+# 리포트 설정
+report:
+  # 리포트 형식
+  format: markdown
+  
+  # 포함 항목
+  include_summary: true
+  include_detailed_products: true
+  include_alternatives: true
+  include_buying_guide: true
+  
+  # 대안 제안
+  alternatives:
+    max_count: 3
+    min_trust_score: 0.6
+
+# 카테고리별 설정
+categories:
+  electronics:
+    validation:
+      stock_check: true
+      spec_match: true
+      price_consistency: true
+      warranty_check: true
+    search:
+      priority_sources: ["danawa", "coupang", "naver_shopping"]
+  
+  clothing:
+    validation:
+      stock_check: true
+      size_match: true
+      color_match: true
+      price_consistency: true
+    search:
+      priority_sources: ["naver_shopping", "coupang", "11st"]
+  
+  food:
+    validation:
+      stock_check: true
+      expiry_check: true
+      price_consistency: true
+    search:
+      priority_sources: ["coupang", "naver_shopping"]
+  
+  books:
+    validation:
+      stock_check: true
+      edition_check: true
+      price_consistency: true
+    search:
+      priority_sources: ["yes24", "kyobo", "naver_shopping"]
